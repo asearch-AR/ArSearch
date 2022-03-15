@@ -6,7 +6,7 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-func main() {
+func main1() {
 	// Instantiate default collector
 	c := colly.NewCollector(
 		// Visit only domains: hackerspaces.org, wiki.hackerspaces.org

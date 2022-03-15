@@ -1,17 +1,21 @@
 package controller
 
 import (
-	"fmt"
+	"ArSearch/pkg/service"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
-func SearchData(c *gin.Context){
-
+func SearchData(c *gin.Context) {
 	param := c.Query("q")
-	fmt.Println(param)
+	res, err := service.SearchInEs(param)
 
-	c.JSON(http.StatusOK,gin.H{
-		"data":"hello",
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err_msg":err.Error(),
+		})
+	}
+
+	c.JSON(200, gin.H{
+		"data": res,
 	})
 }

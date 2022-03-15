@@ -1,59 +1,113 @@
 package service
 
 import (
-	"ArSearch/pkg/service/service_schema"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/olivere/elastic"
+	"log"
+	"strings"
+
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
+
+	"ArSearch/pkg/service/service_schema"
 )
 
-var esClient *elastic.Client
+var es *elasticsearch.Client
 
 func init() {
-	esClient, _ = elastic.NewClient(elastic.SetSniff(false), elastic.SetURL("http://localhost:9200/"))
+
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			"http://localhost:9200",
+			"http://localhost:9201",
+		},
+	}
+
+	es, _ = elasticsearch.NewClient(cfg)
 }
 
 func PutToEs(article *service_schema.ArArticle) (string, error) {
+	m1, _ := json.Marshal(article)
 
-	res, err := esClient.Index().
-		Index("ar_search").
-		Type("ar_article").
-		Id(article.ID).
-		BodyJson(article).
-		Do(context.Background())
-
-	if err != nil {
-		return "err", err
+	req := esapi.IndexRequest{
+		Index:        "ar_search",
+		DocumentType: "ar_article",
+		DocumentID:   article.ID,
+		Body:         strings.NewReader(string(m1)),
+		Refresh:      "true",
 	}
 
-	return res.Result, nil
+	res, err := req.Do(context.Background(), es)
+
+	if err != nil {
+		return "", err
+	}
+
+	return res.String(), nil
 }
 
-func SearchInEs(termQuery string) ([]*service_schema.ArArticle, error) {
-	fmt.Println("start====>")
+func SearchInEs(termQuery string) ([]service_schema.ArSearchRes, error) {
 
-	searchResult, err := esClient.Search().
-		Index("ar_search"). // search in index "twitter"
-		Type("ar_article").
-		//Query(termQuery).        // specify the query
-		Pretty(true).          // pretty print request and response JSON
-		Do(context.Background())     // execute
+	var buf bytes.Buffer
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"bool":map[string]interface{}{
+				"should":[]map[string]interface{}{
+					{"match": map[string]interface{}{"article_context":termQuery,}},
+					{"match": map[string]interface{}{"title":termQuery,}},
+				},
+			},
+		},
+	}
+
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		log.Fatalf("Error encoding query: %s", err)
+	}
+
+	fmt.Println("query==>",buf.String())
+
+
+	res, err := es.Search(
+		es.Search.WithContext(context.Background()),
+		es.Search.WithIndex("ar_search"),
+		es.Search.WithDocumentType("ar_article"),
+		es.Search.WithBody(&buf),
+		es.Search.WithTrackTotalHits(true),
+		es.Search.WithPretty(),
+	)
 
 	if err != nil {
-		return nil,err
+		return []service_schema.ArSearchRes{}, err
 	}
-	fmt.Println("err===>",err.Error())
+	defer res.Body.Close()
 
-	r1, _ := json.Marshal(searchResult)
-	fmt.Println("res===>",string(r1))
+	var r map[string]interface{}
 
-	return nil,nil
-	//arList := make([]*service_schema.ArArticle, 0)
-	//var article service_schema.ArArticle
-	//for _, item := range searchResult.Each(reflect.TypeOf(article)) {
-	//	arList = append(arList,item.(*service_schema.ArArticle))
-	//}
-	//
-	//return arList,nil
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		log.Fatalf("Error parsing the response body: %s", err)
+	}
+
+	searchResList := make([]service_schema.ArSearchRes, 0)
+	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+		article := hit.(map[string]interface{})["_source"].(map[string]interface{})
+		score := hit.(map[string]interface{})["_score"]
+		res := service_schema.ArSearchRes{
+			Score: score.(float64),
+			Article: service_schema.ArArticle{
+				ID:             article["id"].(string),
+				ArticleContext: article["article_context"].(string),
+				Owner:          article["owner"].(string),
+				Title:          article["title"].(string),
+				DataSize:       article["data_size"].(float64),
+			},
+			RedirectUrl: fmt.Sprintf("https://arweave.net/%s",article["id"].(string)),
+		}
+
+
+		searchResList = append(searchResList, res)
+	}
+
+	return searchResList, nil
 }
