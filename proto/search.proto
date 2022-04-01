@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package search_proto;
+
+//protoc --go_out=plugins=grpc:. search.proto
+enum LanguageType {
+    UNKNOWN = 0;
+    EN = 1;
+    ZH_CN = 2;
+}
+
+message TermInfo{
+    string rawWord = 1;
+}
+
+message SearchRequest{
+    string query = 1;
+    repeated TermInfo terms = 2;
+    string traceId = 3;
+    string userIp = 4;
+    int64  timestamp = 5;
+    int32  limit = 6;
+    LanguageType lang = 7;
+}
+
+message SearchResponseItem{
+    string title = 1;
+    string subContext = 2;
+    string url = 3;
+    float  rankScore = 4;
+    float  rerankScore = 5;
+}
+
+message SearchResponse{
+    int32 count = 1;
+    repeated SearchResponseItem searchItems = 2;
+}
+
+service ArSearch{
+    rpc SearchOnCluster(SearchRequest)  returns (SearchResponse);
+}
+
