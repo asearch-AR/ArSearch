@@ -16,9 +16,8 @@ type server struct {
 	pb.UnimplementedArSearchServer
 }
 
-// SayHello implements helloworld.GreeterServer
 func (s *server) SearchOnCluster(ctx context.Context, in *pb.SearchRequest) (*pb.SearchResponse, error) {
-
+	//todo impl
 	fmt.Println("ack")
 	list :=make([]*pb.SearchResponseItem,0)
 	return &pb.SearchResponse{Count: int32(len(list)),SearchItems: list,}, nil

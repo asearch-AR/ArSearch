@@ -34,6 +34,7 @@ func main() {
 		fmt.Println("Visiting", r.URL.String())
 	})
 
+	//拼url :https://arweave.net/[tx_id]
 	// Start scraping on https://hackerspaces.org
 	c.Visit("https://arweave.net/koehrOAeK5Lpc860JoLo-Gc6ODiCv0JCSwqtR8UWYGY")
 }
