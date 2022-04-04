@@ -20,8 +20,8 @@ func init() {
 
 	cfg := elasticsearch.Config{
 		Addresses: []string{
-			"http://localhost:9200",
-			"http://localhost:9201",
+			"http://45.76.151.181:9200",
+			"http://45.76.151.181:9201",
 		},
 	}
 
@@ -98,9 +98,7 @@ func SearchInEs(termQuery string) ([]service_schema.ArSearchRes, error) {
 			Article: service_schema.ArArticle{
 				ID:             article["id"].(string),
 				ArticleContext: article["article_context"].(string),
-				Owner:          article["owner"].(string),
 				Title:          article["title"].(string),
-				DataSize:       article["data_size"].(float64),
 			},
 			RedirectUrl: fmt.Sprintf("https://arweave.net/%s",article["id"].(string)),
 		}
