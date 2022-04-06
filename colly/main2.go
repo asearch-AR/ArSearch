@@ -53,6 +53,7 @@ func main() {
 	)
 
 	// create a request queue with 2 consumer threads
+	//threads 数过大会直接被kill 掉...
 	q, _ := queue.New(
 		5, // Number of consumer threads
 		&queue.InMemoryQueueStorage{MaxSize: 100000}, // Use default queue storage
