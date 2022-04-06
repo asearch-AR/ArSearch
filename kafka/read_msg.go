@@ -22,8 +22,9 @@ func getKafkaReader(kafkaURL, topic, groupID string) *kafka.Reader {
 
 func main() {
 	// get kafka reader using environment variables.
-	kafkaURL := "localhost"
-	topic := "topic"
+	//kafkaURL := "localhost:9092"
+	kafkaURL := "45.76.151.181:9092"
+	topic := "quickstart-events"
 	groupID := "groupId"
 
 	fmt.Println(kafkaURL,topic,groupID)
