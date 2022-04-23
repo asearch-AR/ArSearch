@@ -30,3 +30,13 @@ func TestSearchInEs(t *testing.T) {
 
 	fmt.Println(es)
 }
+
+func TestSearchMirrorData(t *testing.T) {
+	data, err := SearchMirrorData("launch")
+
+	if err!=nil{
+		fmt.Println(err)
+	}
+
+	fmt.Println(data)
+}

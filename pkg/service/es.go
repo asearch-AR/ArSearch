@@ -48,15 +48,35 @@ func PutToEs(article *service_schema.ArArticle) (string, error) {
 	return res.String(), nil
 }
 
+func SaveMirrorData(mirrorData *service_schema.MirrorData) (string, error) {
+	m1, _ := json.Marshal(mirrorData)
+
+	req := esapi.IndexRequest{
+		Index:        "mirror_search",
+		DocumentType: "mirror_article",
+		DocumentID:   mirrorData.ArweaveTx,
+		Body:         strings.NewReader(string(m1)),
+		Refresh:      "true",
+	}
+
+	res, err := req.Do(context.Background(), es)
+
+	if err != nil {
+		return "", err
+	}
+
+	return res.String(), nil
+}
+
 func SearchInEs(termQuery string) ([]service_schema.ArSearchRes, error) {
 
 	var buf bytes.Buffer
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
-			"bool":map[string]interface{}{
-				"should":[]map[string]interface{}{
-					{"match": map[string]interface{}{"article_context":termQuery,}},
-					{"match": map[string]interface{}{"title":termQuery,}},
+			"bool": map[string]interface{}{
+				"should": []map[string]interface{}{
+					{"match": map[string]interface{}{"article_context": termQuery}},
+					{"match": map[string]interface{}{"title": termQuery}},
 				},
 			},
 		},
@@ -65,9 +85,6 @@ func SearchInEs(termQuery string) ([]service_schema.ArSearchRes, error) {
 	if err := json.NewEncoder(&buf).Encode(query); err != nil {
 		log.Fatalf("Error encoding query: %s", err)
 	}
-
-	fmt.Println("query==>",buf.String())
-
 
 	res, err := es.Search(
 		es.Search.WithContext(context.Background()),
@@ -100,11 +117,82 @@ func SearchInEs(termQuery string) ([]service_schema.ArSearchRes, error) {
 				ArticleContext: article["article_context"].(string),
 				Title:          article["title"].(string),
 			},
-			RedirectUrl: fmt.Sprintf("https://arweave.net/%s",article["id"].(string)),
+			RedirectUrl: fmt.Sprintf("https://arweave.net/%s", article["id"].(string)),
 		}
 
-
 		searchResList = append(searchResList, res)
+	}
+
+	return searchResList, nil
+}
+
+func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error) {
+
+	var buf bytes.Buffer
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"bool": map[string]interface{}{
+				"should": []map[string]interface{}{
+					{"match": map[string]interface{}{"content": termQuery}},
+					{"match": map[string]interface{}{"title": termQuery}},
+				},
+			},
+		},
+	}
+
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		log.Fatalf("Error encoding query: %s", err)
+	}
+
+	res, err := es.Search(
+		es.Search.WithContext(context.Background()),
+		es.Search.WithIndex("mirror_search"),
+		es.Search.WithDocumentType("mirror_article"),
+		es.Search.WithBody(&buf),
+		es.Search.WithTrackTotalHits(true),
+		es.Search.WithPretty(),
+	)
+
+	if err != nil {
+		return []service_schema.MirrorSearchRes{}, err
+	}
+	defer res.Body.Close()
+
+	var r map[string]interface{}
+
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		log.Fatalf("Error parsing the response body: %s", err)
+	}
+
+	searchResList := make([]service_schema.MirrorSearchRes, 0)
+	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+		article := hit.(map[string]interface{})["_source"].(map[string]interface{})
+		keys := make([]string, 0)
+		for k, _ := range article {
+			keys = append(keys, k)
+		}
+
+		fmt.Println(keys)
+		score := hit.(map[string]interface{})["_score"]
+		searchRes := service_schema.MirrorSearchRes{
+			MirrorData: service_schema.MirrorData{
+				//Id:              article["id"].(int64),
+				Title:   article["title"].(string),
+				Content: article["content"].(string),
+				//CreatedAt:       article["createdAt"].(time.Time),
+				//PublishedAt:     article["publishedAt"].(time.Time),
+				Digest:          article["digest"].(string),
+				Link:            article["link"].(string),
+				OriginalDigest:  article["originalDigest"].(string),
+				PublicationName: article["publicationName"].(string),
+				Cursor:          article["cursor"].(string),
+				ArweaveTx:       article["arweaveTx"].(string),
+				//BlockHeight:     article["blockHeight"].(float64),
+			},
+			Score: score.(float64),
+		}
+
+		searchResList = append(searchResList, searchRes)
 	}
 
 	return searchResList, nil

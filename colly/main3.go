@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/queue"
 )
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
 	})
 
-	q.run(c)
+	q.Run(c)
 
 	f.WriteString(result)
 
