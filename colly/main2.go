@@ -41,7 +41,7 @@ func formatString(str string) string {
 	return str
 }
 
-func main() {
+func main11() {
 	urlList := getUrlList("colly/txid.yaml")
 	//urlList := getUrlList("colly/test.yaml")
 

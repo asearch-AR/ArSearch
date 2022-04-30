@@ -11,7 +11,7 @@ type Ctx1 struct {
 	Ctx 	[]string
 }
 
-func main111() {
+func main() {
 	// Instantiate default collector
 	c := colly.NewCollector(
 		// Visit only domains: hackerspaces.org, wiki.hackerspaces.org
@@ -55,7 +55,8 @@ func main111() {
 
 	//拼url :https://arweave.net/[tx_id]
 	// Start scraping on https://hackerspaces.org
-	c.Visit("https://arweave.net/-Vh8fzPNQTJ7UP_h2cnfSY47Zfyo5LhqTqrm5IOivI8")
+	//c.Visit("https://arweave.net/-Vh8fzPNQTJ7UP_h2cnfSY47Zfyo5LhqTqrm5IOivI8")
+	c.Visit("https://mirror.xyz/0x707D306714FF28560f32bF9DAE973BD33cd851c5/96oLZtaMi1XgialvnpEsk7kEwen3Daqy7PBWOb0jItk")
 	//c.Visit("https://arweave.net/koehrOAeK5Lpc860JoLo-Gc6ODiCv0JCSwqtR8UWYGY")
 
 	fmt.Println("res===>",m)

@@ -11,7 +11,7 @@ import (
 	"github.com/gocolly/colly/v2/queue"
 )
 
-func main() {
+func main22() {
 	fileName := "txid.yaml"
 	var result string
 
