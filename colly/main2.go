@@ -1,15 +1,17 @@
 package main
 
 import (
-	"ArSearch/pkg/service"
-	"ArSearch/pkg/service/service_schema"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strings"
+
+	"ArSearch/pkg/service"
+	"ArSearch/pkg/service/service_schema"
+
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"strings"
 )
 
 type TxList struct {

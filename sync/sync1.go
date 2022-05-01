@@ -8,7 +8,7 @@ import (
 )
 
 // sync all arweave tx
-func main() {
+func main1111() {
 	nullFilterParams := arsyncer.FilterParams{
 		Tags: []types.Tag{
 			{
