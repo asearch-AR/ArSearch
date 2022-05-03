@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/everFinance/arsyncer"
 	"github.com/everFinance/goar/types"
 )
