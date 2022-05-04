@@ -7,52 +7,51 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"strings"
 	"sync"
-
-	"github.com/labstack/gommon/log"
 )
 
 //sync mirror data
+func GetMirrorTxId1(offset int64) service_schema.ArData1 {
 
-func GetMirrorTxId() service_schema.MirrorData1 {
-	v := service_schema.MirrorData1{}
+	res := service_schema.ArData1{}
 
-	url := "https://arweave.net/graphql"
+	url := fmt.Sprintf("https://api.viewblock.io/arweave/addresses/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c/txs?page=%d&network=mainnet", offset)
 
-	payload := strings.NewReader("{\"query\":\"query {\\n    transactions(\\n        tags: [\\n            {\\n                name: \\\"App-Name\\\",\\n                values: [\\\"MirrorXYZ\\\"]\\n            }\\n        ]\\n    ) {\\n        edges {\\n            node {\\n                id\\n            }\\n        }\\n    }\\n}\",\"variables\":{}}")
-
-	client := &http.Client{}
-
-	req, err := http.NewRequest(http.MethodPost, url, payload)
-
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println(err)
-		return v
+		log.Println("err===>", err)
 	}
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Origin", "https://viewblock.io")
+	req.Header.Set("Referer", "https://viewblock.io/")
+	req.Header.Set("Sec-Fetch-Dest", "empty")
+	req.Header.Set("Sec-Fetch-Mode", "cors")
+	req.Header.Set("Sec-Fetch-Site", "same-site")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36")
+	req.Header.Set("Sec-Ch-Ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"101\", \"Google Chrome\";v=\"101\"")
+	req.Header.Set("Sec-Ch-Ua-Mobile", "?0")
+	req.Header.Set("Sec-Ch-Ua-Platform", "\"macOS\"")
 
-	res, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Println(err)
-		return v
+		log.Println("err===>", err)
 	}
-	defer res.Body.Close()
+	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
-		return v
-	}
-	err1 := json.Unmarshal(body, &v)
-
-	if err1 != nil {
-		fmt.Println(err1)
-		return v
+		log.Println("err====>", err)
+		//return []byte{}
 	}
 
-	return v
+	//fmt.Println("===>", string(body))
+	json.Unmarshal(body, &res)
+	return res
 }
 
 func GetTxInfo(txId string) service_schema.ArData {
@@ -84,25 +83,28 @@ func GetTxInfo(txId string) service_schema.ArData {
 }
 
 func main() {
+
 	cli, _ := service.GetKafkaCli()
-x:
-	ids := GetMirrorTxId()
 
-	edges := ids.Data.Transactions.Edges
-
+	var i int64 = 1
 	wg := sync.WaitGroup{}
-	for _, v := range edges {
-		wg.Add(1)
-		txId := v.Node.ID
-		//2.fetch tx info
-		go func() {
-			info := GetTxInfo(txId)
-			marshal, _ := json.Marshal(info)
-			write, _ := cli.Write(marshal)
-			log.Info("write===>", write)
-			wg.Done()
-		}()
+
+	for {
+		txIdList := GetMirrorTxId1(i)
+		for _, v := range txIdList.Docs {
+			wg.Add(1)
+
+			go func(txId string) {
+				info := GetTxInfo(txId)
+				marshal, _ := json.Marshal(info)
+				cli.Write(marshal)
+				wg.Done()
+			}(v.Hash)
+		}
+
+		fmt.Println("==========>",i)
+		i++
 	}
+
 	wg.Wait()
-	goto x
 }

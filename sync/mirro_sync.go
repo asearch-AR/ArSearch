@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"ArSearch/pkg/service"
 	"ArSearch/pkg/service/service_schema"
@@ -37,7 +38,7 @@ func fetch(url string) []byte {
 
 const url = "https://mirror.cjpais.com/api/publisher/%s"
 
-func main22() {
+func main() {
 	//1.fetch from https://mirror.cjpais.com/api/publishers
 	url1 := "https://mirror.cjpais.com/api/publishers"
 	publisherBytes := fetch(url1)
@@ -62,6 +63,7 @@ func main22() {
 				}
 				fmt.Println(data)
 				wg.Done()
+				time.Sleep(time.Millisecond * 200)
 			}()
 		}
 

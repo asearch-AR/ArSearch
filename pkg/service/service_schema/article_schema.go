@@ -74,6 +74,47 @@ type ArData struct {
 	OriginalDigest string `json:"originalDigest"`
 }
 
+type ArData1 struct {
+	Docs []struct {
+		Hash        string `json:"hash"`
+		BlockHeight int    `json:"blockHeight"`
+		Timestamp   int64  `json:"timestamp"`
+		Status      string `json:"status"`
+		Fee         string `json:"fee"`
+		Labels      struct {
+		} `json:"labels"`
+		AddressTypes struct {
+		} `json:"addressTypes"`
+		Direction string `json:"direction"`
+		From      string `json:"from"`
+		To        string `json:"to"`
+		Value     string `json:"value"`
+		Type      string `json:"type"`
+		Extra     struct {
+			Tags []struct {
+				Name  string `json:"name"`
+				Value string `json:"value"`
+			} `json:"tags"`
+			Owner  string `json:"owner"`
+			LastTx string `json:"lastTx"`
+			Dapp   struct {
+				Name string `json:"name"`
+				Key  string `json:"key"`
+			} `json:"dapp"`
+			DataSize      string `json:"dataSize"`
+			ObservedCount int    `json:"observedCount"`
+		} `json:"extra"`
+	} `json:"docs"`
+	Page   string `json:"page"`
+	Limit  int    `json:"limit"`
+	Pages  int    `json:"pages"`
+	Total  int    `json:"total"`
+	Type   string `json:"type"`
+	Tokens struct {
+	} `json:"tokens"`
+}
+
+
 type MirrorSearchRes struct {
 	MirrorData
 	Score float64

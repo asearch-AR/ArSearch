@@ -8,7 +8,7 @@ import (
 )
 
 func GetKafkaCli() (*kafka.Conn, error) {
-	topic := "quickstart-events"
+	topic := "arsearch-topic"
 	partition := 0
 
 	conn, err := kafka.DialLeader(context.TODO(), "tcp", "localhost:9092", topic, partition)

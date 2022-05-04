@@ -7,14 +7,17 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/elastic/go-elasticsearch/v7/esutil"
 
 	"ArSearch/pkg/service/service_schema"
 )
 
 var es *elasticsearch.Client
+var bi esutil.BulkIndexer
 
 func init() {
 
@@ -26,6 +29,13 @@ func init() {
 	}
 
 	es, _ = elasticsearch.NewClient(cfg)
+
+	bi, _ = esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
+		Index:         "mirror_search",        // The default index name
+		Client:        es,               // The Elasticsearch client
+		NumWorkers:    10,       // The number of worker goroutines
+		FlushInterval: 30 * time.Second, // The periodic flush interval
+	})
 }
 
 func PutToEs(article *service_schema.ArArticle) (string, error) {
@@ -46,6 +56,24 @@ func PutToEs(article *service_schema.ArArticle) (string, error) {
 	}
 
 	return res.String(), nil
+}
+
+func SaveMirrorData1(ctx context.Context,mirrorData []*service_schema.MirrorData){
+	for _,v:=range	mirrorData{
+		m1, _ := json.Marshal(mirrorData)
+		bi.Add(ctx,esutil.BulkIndexerItem{
+			Action:     "create",
+			DocumentID: v.OriginalDigest,
+			Body:       strings.NewReader(string(m1)),
+			OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, item2 esutil.BulkIndexerResponseItem) {
+				fmt.Println("success====>")
+			},
+			OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, item2 esutil.BulkIndexerResponseItem, err error) {
+				fmt.Println("fail====>")
+			},
+		})
+	}
+	//bi.Close(ctx)
 }
 
 func SaveMirrorData(mirrorData *service_schema.MirrorData) (string, error) {
