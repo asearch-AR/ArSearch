@@ -11,10 +11,11 @@ import (
 	"sync"
 )
 
+//==========> 130646
 func main() {
 	kafkaURL := "localhost:9092"
 	//kafkaURL := "45.76.151.181:9092"
-	topic := "quickstart-events"
+	topic := "arsearch-topic"
 	groupID := "groupId"
 	reader := service.GetKafkaReader(kafkaURL, topic, groupID)
 	wg := sync.WaitGroup{}
@@ -50,6 +51,7 @@ func main() {
 			wg.Done()
 		}()
 
+		//time.Sleep(time.Millisecond * 200)
 		//fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 		//time.Sleep(time.Second * 50)
 	}
