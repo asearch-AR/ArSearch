@@ -217,7 +217,7 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 				ArweaveTx:       article["arweaveTx"].(string),
 				//BlockHeight:     article["blockHeight"].(float64),
 			},
-			ArweaveLink: fmt.Sprintf("arweave.net/%s",article["arweaveTx"].(string)),
+			ArweaveLink: fmt.Sprintf("https://arweave.net/%s",article["arweaveTx"].(string)),
 			Score: score.(float64),
 		}
 
