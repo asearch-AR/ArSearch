@@ -117,5 +117,6 @@ type ArData1 struct {
 
 type MirrorSearchRes struct {
 	MirrorData
+	ArweaveLink string `json:"arweave_link"`
 	Score float64
 }

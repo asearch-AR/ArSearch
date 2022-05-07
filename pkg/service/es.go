@@ -31,9 +31,9 @@ func init() {
 	es, _ = elasticsearch.NewClient(cfg)
 
 	bi, _ = esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
-		Index:         "mirror_search",        // The default index name
+		Index:         "mirror_search",  // The default index name
 		Client:        es,               // The Elasticsearch client
-		NumWorkers:    10,       // The number of worker goroutines
+		NumWorkers:    10,               // The number of worker goroutines
 		FlushInterval: 30 * time.Second, // The periodic flush interval
 	})
 }
@@ -58,10 +58,10 @@ func PutToEs(article *service_schema.ArArticle) (string, error) {
 	return res.String(), nil
 }
 
-func SaveMirrorData1(ctx context.Context,mirrorData []*service_schema.MirrorData){
-	for _,v:=range	mirrorData{
+func SaveMirrorData1(ctx context.Context, mirrorData []*service_schema.MirrorData) {
+	for _, v := range mirrorData {
 		m1, _ := json.Marshal(mirrorData)
-		bi.Add(ctx,esutil.BulkIndexerItem{
+		bi.Add(ctx, esutil.BulkIndexerItem{
 			Action:     "create",
 			DocumentID: v.OriginalDigest,
 			Body:       strings.NewReader(string(m1)),
@@ -217,6 +217,7 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 				ArweaveTx:       article["arweaveTx"].(string),
 				//BlockHeight:     article["blockHeight"].(float64),
 			},
+			ArweaveLink: fmt.Sprintf("arweave.net/%s",article["arweaveTx"].(string)),
 			Score: score.(float64),
 		}
 
