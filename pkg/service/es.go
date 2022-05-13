@@ -58,24 +58,6 @@ func PutToEs(article *service_schema.ArArticle) (string, error) {
 	return res.String(), nil
 }
 
-func SaveMirrorData1(ctx context.Context, mirrorData []*service_schema.MirrorData) {
-	for _, v := range mirrorData {
-		m1, _ := json.Marshal(mirrorData)
-		bi.Add(ctx, esutil.BulkIndexerItem{
-			Action:     "create",
-			DocumentID: v.OriginalDigest,
-			Body:       strings.NewReader(string(m1)),
-			OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, item2 esutil.BulkIndexerResponseItem) {
-				fmt.Println("success====>")
-			},
-			OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, item2 esutil.BulkIndexerResponseItem, err error) {
-				fmt.Println("fail====>")
-			},
-		})
-	}
-	//bi.Close(ctx)
-}
-
 func SaveMirrorData(mirrorData *service_schema.MirrorData) (string, error) {
 	m1, _ := json.Marshal(mirrorData)
 
@@ -88,7 +70,6 @@ func SaveMirrorData(mirrorData *service_schema.MirrorData) (string, error) {
 	}
 
 	res, err := req.Do(context.Background(), es)
-
 	if err != nil {
 		return "", err
 	}
