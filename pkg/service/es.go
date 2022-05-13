@@ -80,7 +80,7 @@ func SaveMirrorData(mirrorData *service_schema.MirrorData) (string, error) {
 	m1, _ := json.Marshal(mirrorData)
 
 	req := esapi.IndexRequest{
-		Index:        "mirror_search",
+		Index:        "mirror_search_v1",
 		DocumentType: "mirror_article",
 		DocumentID:   mirrorData.ArweaveTx,
 		Body:         strings.NewReader(string(m1)),
@@ -174,7 +174,7 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 
 	res, err := es.Search(
 		es.Search.WithContext(context.Background()),
-		es.Search.WithIndex("mirror_search"),
+		es.Search.WithIndex("mirror_search_v1"),
 		es.Search.WithDocumentType("mirror_article"),
 		es.Search.WithBody(&buf),
 		es.Search.WithTrackTotalHits(true),

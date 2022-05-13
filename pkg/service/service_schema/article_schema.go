@@ -28,6 +28,7 @@ type MirrorData struct {
 	Cursor          string    `json:"cursor"`
 	ArweaveTx       string    `json:"arweaveTx"`
 	BlockHeight     int64     `json:"blockHeight"`
+	Contributor     string    `json:"contributor"`
 }
 
 type ArSearchRes struct {
@@ -35,7 +36,6 @@ type ArSearchRes struct {
 	RedirectUrl string
 	Article     ArArticle
 }
-
 
 //mirror data struct
 type MirrorData1 struct {
@@ -72,6 +72,8 @@ type ArData struct {
 	} `json:"nft"`
 	Version        string `json:"version"`
 	OriginalDigest string `json:"originalDigest"`
+
+	ArWeaveTx string `json:"arweave_tx"` //原始arweave_txid
 }
 
 type ArData1 struct {
@@ -114,9 +116,8 @@ type ArData1 struct {
 	} `json:"tokens"`
 }
 
-
 type MirrorSearchRes struct {
 	MirrorData
 	ArweaveLink string `json:"arweave_link"`
-	Score float64
+	Score       float64
 }

@@ -79,6 +79,8 @@ func GetTxInfo(txId string) service_schema.ArData {
 	}
 
 	json.Unmarshal(body, &data)
+	//写入一下arweave_txid
+	data.ArWeaveTx = txId
 	return data
 }
 
