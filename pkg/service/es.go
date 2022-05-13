@@ -200,15 +200,21 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 			keys = append(keys, k)
 		}
 
-		fmt.Println(keys)
 		score := hit.(map[string]interface{})["_score"]
+
+		//todo 这里处理有点问题
+		//"2022-05-11T23:58:06+08:00"
+		createAt :=article["createdAt"].(string)
+		createAt = createAt[:10]
+		t1,_:=time.Parse("2006-01-02", createAt)
+
 		searchRes := service_schema.MirrorSearchRes{
 			MirrorData: service_schema.MirrorData{
 				//Id:              article["id"].(int64),
 				Title:   article["title"].(string),
 				Content: article["content"].(string),
-				//CreatedAt:       article["createdAt"].(time.Time),
-				//PublishedAt:     article["publishedAt"].(time.Time),
+				CreatedAt:       t1,
+				PublishedAt:     t1,
 				Digest:          article["digest"].(string),
 				Link:            article["link"].(string),
 				OriginalDigest:  article["originalDigest"].(string),
