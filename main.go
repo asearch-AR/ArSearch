@@ -2,11 +2,14 @@ package main
 
 import (
 	"ArSearch/pkg/controller"
+
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
+	pprof.Register(r)
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",

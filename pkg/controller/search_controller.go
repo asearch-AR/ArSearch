@@ -2,6 +2,7 @@ package controller
 
 import (
 	"ArSearch/pkg/service"
+
 	"github.com/gin-gonic/gin"
 )
 

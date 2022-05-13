@@ -179,6 +179,7 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 		es.Search.WithBody(&buf),
 		es.Search.WithTrackTotalHits(true),
 		es.Search.WithPretty(),
+		es.Search.WithSize(30),
 	)
 
 	if err != nil {
@@ -193,12 +194,23 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 	}
 
 	searchResList := make([]service_schema.MirrorSearchRes, 0)
+
+	distinctMap:=make(map[string]bool,30)
+
 	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+
 		article := hit.(map[string]interface{})["_source"].(map[string]interface{})
 		keys := make([]string, 0)
 		for k, _ := range article {
 			keys = append(keys, k)
 		}
+
+		uniqueId := article["originalDigest"].(string)
+
+		if _,ok := distinctMap[uniqueId];ok{
+			continue
+		}
+		distinctMap[uniqueId] = true
 
 		score := hit.(map[string]interface{})["_score"]
 
