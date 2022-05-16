@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strings"
+
 	"ArSearch/pkg/service"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +25,7 @@ func SearchData(c *gin.Context) {
 
 func SearchOnMirror(c *gin.Context) {
 	param := c.Query("q")
+	param = strings.ToLower(param)
 	res, err := service.SearchMirrorData(param)
 
 	if err != nil {
