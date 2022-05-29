@@ -52,6 +52,13 @@ func main() {
 	reader := service.GetKafkaReader(kafkaURL, topic, groupID)
 	wg := sync.WaitGroup{}
 
+	defer func() {
+		err := recover()
+		if err != nil {
+			fmt.Println("recover err==>", err)
+		}
+	}()
+
 	group, _ := errgroup.WithContext(ctx)
 	for {
 		wg.Add(1)
@@ -76,7 +83,7 @@ func main() {
 				CreatedAt:      time.Unix(int64(v.Content.Timestamp), 0),
 				PublishedAt:    time.Unix(int64(v.Content.Timestamp), 0),
 				ArweaveTx:      v.ArWeaveTx,
-				Contributor: v.Authorship.Contributor,
+				Contributor:    v.Authorship.Contributor,
 			}
 			data, err1 := service.SaveMirrorData(&mirroData)
 			if err1 != nil {
