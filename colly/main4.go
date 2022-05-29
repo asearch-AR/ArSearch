@@ -61,7 +61,6 @@ func main() {
 
 	group, _ := errgroup.WithContext(ctx)
 	for {
-		wg.Add(1)
 
 		group.Go(func() error {
 			m, err := reader.ReadMessage(context.Background())
@@ -98,5 +97,9 @@ func main() {
 		//fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 		//time.Sleep(time.Second * 50)
 	}
-	wg.Wait()
+
+	err2 := group.Wait()
+	if err2 != nil {
+		fmt.Println("err2===>", err2)
+	}
 }
