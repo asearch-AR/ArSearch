@@ -49,7 +49,6 @@ func main() {
 
 	ctx := context.Background()
 	reader := service.GetKafkaReader(kafkaURL, topic, groupID)
-
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -57,6 +56,8 @@ func main() {
 		}
 	}()
 
+	m, _ := reader.ReadMessage(context.Background())
+	fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 	group, _ := errgroup.WithContext(ctx)
 	for {
 
