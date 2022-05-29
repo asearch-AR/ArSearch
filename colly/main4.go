@@ -10,6 +10,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 //==========> 130646
@@ -45,16 +47,19 @@ func main() {
 	//kafkaURL := "45.76.151.181:9092"
 	topic := "arsearch-topic"
 	groupID := "groupId"
+
+	ctx := context.Background()
 	reader := service.GetKafkaReader(kafkaURL, topic, groupID)
 	wg := sync.WaitGroup{}
+
+	group, _ := errgroup.WithContext(ctx)
 	for {
 		wg.Add(1)
 
-		go func() {
-
+		group.Go(func() error {
 			m, err := reader.ReadMessage(context.Background())
 			if err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 
 			v := service_schema.ArData{}
@@ -78,9 +83,9 @@ func main() {
 				fmt.Println("err===>", err1)
 			}
 			fmt.Println("data=====>", data)
-
 			wg.Done()
-		}()
+			return err1
+		})
 
 		//time.Sleep(time.Millisecond * 200)
 		//fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
