@@ -50,7 +50,6 @@ func main() {
 
 	ctx := context.Background()
 	reader := service.GetKafkaReader(kafkaURL, topic, groupID)
-	wg := sync.WaitGroup{}
 
 	defer func() {
 		err := recover()
@@ -88,13 +87,12 @@ func main() {
 			if err1 != nil {
 				fmt.Println("err===>", err1)
 			}
+			fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 			fmt.Println("data=====>", data)
-			wg.Done()
 			return err1
 		})
 
-		//time.Sleep(time.Millisecond * 200)
-		//fmt.Printf("message at topic:%v partition:%v offset:%v	%s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		time.Sleep(time.Millisecond * 200)
 		//time.Sleep(time.Second * 50)
 	}
 
