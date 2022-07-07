@@ -82,7 +82,6 @@ func GetTxInfo(txId string) service_schema.ArData {
 		return data
 	}
 
-	fmt.Println("body==>",string(body))
 	json.Unmarshal(body, &data)
 	//写入一下arweave_txid
 	data.ArWeaveTx = txId
@@ -105,7 +104,6 @@ func main() {
 			go func(txId string) {
 				info := GetTxInfo(txId)
 				marshal, _ := json.Marshal(info)
-				fmt.Println("res==>",string(marshal))
 				cli.Write(marshal)
 				wg.Done()
 			}(v.Hash)
