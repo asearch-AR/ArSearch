@@ -103,7 +103,9 @@ func main() {
 			go func(txId string) {
 				info := GetTxInfo(txId)
 				marshal, _ := json.Marshal(info)
-				cli.Write(marshal)
+				write, err := cli.Write(marshal)
+				fmt.Println("res===>",write)
+				fmt.Println("err===>",err)
 				fmt.Println("info===>",string(marshal))
 				wg.Done()
 			}(v.Hash)
