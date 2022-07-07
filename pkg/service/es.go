@@ -176,9 +176,9 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 
 	searchResList := make([]service_schema.MirrorSearchRes, 0)
 
-	distinctMap:=make(map[string]bool,30)
+	distinctMap := make(map[string]bool, 30)
 
-	if r["hits"] == nil{
+	if r["hits"] == nil {
 		log.Println("hits nil")
 		return []service_schema.MirrorSearchRes{}, nil
 	}
@@ -193,7 +193,7 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 
 		uniqueId := article["originalDigest"].(string)
 
-		if _,ok := distinctMap[uniqueId];ok{
+		if _, ok := distinctMap[uniqueId]; ok {
 			continue
 		}
 		distinctMap[uniqueId] = true
@@ -202,15 +202,15 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 
 		//todo 这里处理有点问题
 		//"2022-05-11T23:58:06+08:00"
-		createAt :=article["createdAt"].(string)
+		createAt := article["createdAt"].(string)
 		createAt = createAt[:10]
-		t1,_:=time.Parse("2006-01-02", createAt)
+		t1, _ := time.Parse("2006-01-02", createAt)
 
 		searchRes := service_schema.MirrorSearchRes{
 			MirrorData: service_schema.MirrorData{
 				//Id:              article["id"].(int64),
-				Title:   article["title"].(string),
-				Content: article["content"].(string),
+				Title:           article["title"].(string),
+				Content:         article["content"].(string),
 				CreatedAt:       t1,
 				PublishedAt:     t1,
 				Digest:          article["digest"].(string),
@@ -221,8 +221,8 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 				ArweaveTx:       article["arweaveTx"].(string),
 				//BlockHeight:     article["blockHeight"].(float64),
 			},
-			ArweaveLink: fmt.Sprintf("https://arweave.net/%s",article["arweaveTx"].(string)),
-			Score: score.(float64),
+			ArweaveLink: fmt.Sprintf("https://arweave.net/%s", article["arweaveTx"].(string)),
+			Score:       score.(float64),
 		}
 
 		searchResList = append(searchResList, searchRes)

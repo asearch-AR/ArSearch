@@ -100,6 +100,8 @@ func main() {
 				info := GetTxInfo(txId)
 				marshal, _ := json.Marshal(info)
 				cli.Write(marshal)
+
+				fmt.Println("info===>",string(marshal))
 				wg.Done()
 			}(v.Hash)
 		}
