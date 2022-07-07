@@ -17,25 +17,28 @@ func GetMirrorTxId1(offset int64) service_schema.ArData1 {
 
 	res := service_schema.ArData1{}
 
-	url := fmt.Sprintf("https://api.viewblock.io/arweave/addresses/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c/txs?page=%d&network=mainnet", offset)
+	//api.viewblock.io/arweave/address/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c?page=1
+	url := fmt.Sprintf("https://api.viewblock.io/arweave/addresses/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c?network=mainnet&page=%d", offset)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println("err===>", err)
 	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
-	req.Header.Set("Connection", "keep-alive")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Origin", "https://viewblock.io")
-	req.Header.Set("Referer", "https://viewblock.io/")
-	req.Header.Set("Sec-Fetch-Dest", "empty")
-	req.Header.Set("Sec-Fetch-Mode", "cors")
-	req.Header.Set("Sec-Fetch-Site", "same-site")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36")
-	req.Header.Set("Sec-Ch-Ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"101\", \"Google Chrome\";v=\"101\"")
-	req.Header.Set("Sec-Ch-Ua-Mobile", "?0")
-	req.Header.Set("Sec-Ch-Ua-Platform", "\"macOS\"")
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Accept-Language", "zh-CN,zh;q=0.9")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("If-None-Match", "W/\"9841-PZ35DpkNzBKubDpmzTcfZoiT8Vs\"")
+	req.Header.Add("Origin", "https://viewblock.io")
+	req.Header.Add("Referer", "https://viewblock.io/")
+	req.Header.Add("Sec-Fetch-Dest", "empty")
+	req.Header.Add("Sec-Fetch-Mode", "cors")
+	req.Header.Add("Sec-Fetch-Site", "same-site")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
+	req.Header.Add("sec-ch-ua", "\".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"")
+	req.Header.Add("sec-ch-ua-mobile", "?0")
+	req.Header.Add("sec-ch-ua-platform", "\"macOS\"")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -100,7 +103,6 @@ func main() {
 				info := GetTxInfo(txId)
 				marshal, _ := json.Marshal(info)
 				cli.Write(marshal)
-
 				fmt.Println("info===>",string(marshal))
 				wg.Done()
 			}(v.Hash)
