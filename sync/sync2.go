@@ -52,7 +52,7 @@ func GetMirrorTxId1(offset int64) service_schema.ArData1 {
 		//return []byte{}
 	}
 
-	//fmt.Println("===>", string(body))
+	fmt.Println("===>", string(body))
 	json.Unmarshal(body, &res)
 	return res
 }
