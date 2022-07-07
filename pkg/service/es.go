@@ -178,6 +178,11 @@ func SearchMirrorData(termQuery string) ([]service_schema.MirrorSearchRes, error
 
 	distinctMap:=make(map[string]bool,30)
 
+	if r["hits"] == nil{
+		log.Println("hits nil")
+		return []service_schema.MirrorSearchRes{}, nil
+	}
+
 	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
 
 		article := hit.(map[string]interface{})["_source"].(map[string]interface{})
