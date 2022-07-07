@@ -90,7 +90,8 @@ func GetTxInfo(txId string) service_schema.ArData {
 
 func main() {
 
-	cli, _ := service.GetKafkaCli()
+	cli, err := service.GetKafkaCli()
+	fmt.Println("err===>",err)
 
 	var i int64 = 1
 	wg := sync.WaitGroup{}
@@ -98,15 +99,13 @@ func main() {
 	for {
 		txIdList := GetMirrorTxId1(i)
 		for _, v := range txIdList.Txs.Docs {
+			fmt.Println("hash===>",v.Hash)
 			wg.Add(1)
-
 			go func(txId string) {
 				info := GetTxInfo(txId)
 				marshal, _ := json.Marshal(info)
-				write, err := cli.Write(marshal)
-				fmt.Println("res===>",write)
-				fmt.Println("err===>",err)
-				fmt.Println("info===>",string(marshal))
+				fmt.Println("res==>",string(marshal))
+				cli.Write(marshal)
 				wg.Done()
 			}(v.Hash)
 		}
