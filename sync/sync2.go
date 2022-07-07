@@ -13,12 +13,13 @@ import (
 )
 
 //sync mirror data
-func GetMirrorTxId1(offset int64) service_schema.ArData1 {
+func GetMirrorTxId1(offset int64) service_schema.ArData2 {
 
-	res := service_schema.ArData1{}
+	res := service_schema.ArData2{}
 
 	//api.viewblock.io/arweave/address/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c?page=1
-	url := fmt.Sprintf("https://api.viewblock.io/arweave/addresses/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c?network=mainnet&page=%d", offset)
+	url := "https://api.viewblock.io/arweave/addresses/Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c?network=mainnet&page=%d"
+	url = fmt.Sprintf(url,offset)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -52,7 +53,7 @@ func GetMirrorTxId1(offset int64) service_schema.ArData1 {
 		//return []byte{}
 	}
 
-	fmt.Println("===>", string(body))
+	//fmt.Println(string(body))
 	json.Unmarshal(body, &res)
 	return res
 }
@@ -96,7 +97,7 @@ func main() {
 
 	for {
 		txIdList := GetMirrorTxId1(i)
-		for _, v := range txIdList.Docs {
+		for _, v := range txIdList.Txs.Docs {
 			wg.Add(1)
 
 			go func(txId string) {

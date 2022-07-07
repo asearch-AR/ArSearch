@@ -38,7 +38,7 @@ func fetch(url string) []byte {
 
 const url = "https://mirror.cjpais.com/api/publisher/%s"
 
-func main() {
+func main11() {
 	//1.fetch from https://mirror.cjpais.com/api/publishers
 	url1 := "https://mirror.cjpais.com/api/publishers"
 	publisherBytes := fetch(url1)
